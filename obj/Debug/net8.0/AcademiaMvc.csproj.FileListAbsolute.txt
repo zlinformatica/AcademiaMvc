@@ -255,4 +255,3 @@ C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\refint\AcademiaMvc.dll
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.pdb
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.genruntimeconfig.cache
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\ref\AcademiaMvc.dll
-C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AcademiaMvc.Models;
+using AcademiaMvc.Services;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AcademiaMvc.Controllers
@@ -13,10 +14,12 @@ namespace AcademiaMvc.Controllers
     public class AlunosController : Controller
     {
         private readonly AcademiaDbContext _context;
+        private readonly EquipamentoService _equipamentoService;
 
-        public AlunosController(AcademiaDbContext context)
+        public AlunosController(AcademiaDbContext context, EquipamentoService equipamentoService)
         {
             _context = context;
+            _equipamentoService = equipamentoService;
         }
 
         // GET: Alunos
@@ -28,26 +31,10 @@ namespace AcademiaMvc.Controllers
             return View(await alunos.ToListAsync());
         }
 
-        // GET: Alunos/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var aluno = await _context.Alunos
-                .Include(a => a.Equipamento)
-                .Include(a => a.Categoria)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (aluno == null) return NotFound();
-
-            return View(aluno);
-        }
-
         // GET: Alunos/Create
         public IActionResult Create()
         {
-            ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos.Where(e => e.Quantidade > 0), "Id", "Nome");
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Nome");
+            CarregarCombos();
             return View();
         }
 
@@ -56,33 +43,30 @@ namespace AcademiaMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome,Idade,Email,Cpf,EquipamentoId,CategoriaId")] Aluno aluno)
         {
-            // Verifica duplicidade CPF
             if (_context.Alunos.Any(a => a.Cpf == aluno.Cpf))
             {
                 ModelState.AddModelError("Cpf", "Já existe um aluno com este CPF.");
             }
 
-            var equipamento = await _context.Equipamentos.FindAsync(aluno.EquipamentoId);
-            if (equipamento == null || equipamento.Quantidade <= 0)
-            {
-                ModelState.AddModelError("EquipamentoId", "Este equipamento não está disponível.");
-            }
-
             if (ModelState.IsValid)
             {
-                equipamento!.Quantidade -= 1;
-                _context.Update(equipamento);
+                if (aluno.EquipamentoId.HasValue)
+                {
+                    var sucesso = await _equipamentoService.AlocarEquipamento(aluno.EquipamentoId.Value);
+                    if (!sucesso)
+                    {
+                        ModelState.AddModelError("EquipamentoId", "Este equipamento não está disponível.");
+                        CarregarCombos(aluno);
+                        return View(aluno);
+                    }
+                }
 
                 _context.Add(aluno);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recarrega combos em caso de erro
-            ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos.Where(e => e.Quantidade > 0), "Id", "Nome", aluno.EquipamentoId);
-
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Nome", aluno.CategoriaId);
-
+            CarregarCombos(aluno);
             return View(aluno);
         }
 
@@ -94,9 +78,7 @@ namespace AcademiaMvc.Controllers
             var aluno = await _context.Alunos.FindAsync(id);
             if (aluno == null) return NotFound();
 
-            ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos, "Id", "Nome", aluno.EquipamentoId);
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Nome", aluno.CategoriaId);
-
+            CarregarCombos(aluno);
             return View(aluno);
         }
 
@@ -116,14 +98,26 @@ namespace AcademiaMvc.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AlunoExists(aluno.Id)) return NotFound();
+                    if (!_context.Alunos.Any(e => e.Id == aluno.Id)) return NotFound();
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos, "Id", "Nome", aluno.EquipamentoId);
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Nome", aluno.CategoriaId);
+            CarregarCombos(aluno);
+            return View(aluno);
+        }
+        // GET: Alunos/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var aluno = await _context.Alunos
+                .Include(a => a.Equipamento)
+                .Include(a => a.Categoria)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (aluno == null) return NotFound();
 
             return View(aluno);
         }
@@ -148,13 +142,12 @@ namespace AcademiaMvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aluno = await _context.Alunos.Include(a => a.Equipamento).FirstOrDefaultAsync(a => a.Id == id);
+            var aluno = await _context.Alunos.FindAsync(id);
             if (aluno != null)
             {
-                if (aluno.Equipamento != null)
+                if (aluno.EquipamentoId.HasValue)
                 {
-                    aluno.Equipamento.Quantidade += 1; // devolve equipamento
-                    _context.Update(aluno.Equipamento);
+                    await _equipamentoService.DevolverEquipamento(aluno.EquipamentoId.Value);
                 }
 
                 _context.Alunos.Remove(aluno);
@@ -163,9 +156,11 @@ namespace AcademiaMvc.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AlunoExists(int id)
+        private void CarregarCombos(Aluno? aluno = null)
         {
-            return _context.Alunos.Any(e => e.Id == id);
+            ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos, "Id", "Nome", aluno?.EquipamentoId);
+            //ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos.Where(e => e.Quantidade > 0), "Id", "Nome", aluno?.EquipamentoId);
+            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Nome", aluno?.CategoriaId);
         }
     }
 }

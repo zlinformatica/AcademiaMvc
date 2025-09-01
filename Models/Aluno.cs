@@ -13,7 +13,7 @@
         public string Cpf { get; set; } = string.Empty; // 🔹 Novo campo
 
         // 🔹 FK para Equipamento
-        public int EquipamentoId { get; set; }
+        public int? EquipamentoId { get; set; }
         public Equipamento? Equipamento { get; set; }
 
         // 🔹 FK para Categoria

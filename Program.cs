@@ -1,7 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using AcademiaMvc.Models;
-using Microsoft.Extensions.DependencyInjection;
 using AcademiaMvc.Data;
+using AcademiaMvc.Models;
+using AcademiaMvc.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ builder.Services.AddDbContext<AcademiaDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<EquipamentoService>();
+
 
 var app = builder.Build();
 
