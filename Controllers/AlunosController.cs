@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AcademiaMvc.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AcademiaMvc.Controllers
 {
@@ -79,6 +80,7 @@ namespace AcademiaMvc.Controllers
 
             // Recarrega combos em caso de erro
             ViewData["EquipamentoId"] = new SelectList(_context.Equipamentos.Where(e => e.Quantidade > 0), "Id", "Nome", aluno.EquipamentoId);
+
             ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Nome", aluno.CategoriaId);
 
             return View(aluno);

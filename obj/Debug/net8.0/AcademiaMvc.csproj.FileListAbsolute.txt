@@ -1,3 +1,4 @@
+C:\DotNetCarequinha\Projetos\AcademiaMvc\bin\Debug\net8.0\wwwroot\data\equipamentos.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\bin\Debug\net8.0\appsettings.Development.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\bin\Debug\net8.0\appsettings.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\bin\Debug\net8.0\global.json
@@ -237,6 +238,7 @@ C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.csproj.Cor
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.MvcApplicationPartsAssemblyInfo.cache
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.RazorAssemblyInfo.cache
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.RazorAssemblyInfo.cs
+C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.sourcelink.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\rjimswa.dswa.cache.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -253,5 +255,4 @@ C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\refint\AcademiaMvc.dll
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.pdb
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.genruntimeconfig.cache
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\ref\AcademiaMvc.dll
-C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\AcademiaMvc.sourcelink.json
 C:\DotNetCarequinha\Projetos\AcademiaMvc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -42,25 +42,36 @@ namespace AcademiaMvc.Controllers
             return View(professor);
         }
 
+        // Lista interna de especialidades
+        private readonly List<string> _especialidades = new List<string>
+        {
+             "Musculação",
+             "Natação",
+             "Yoga",
+             "Pilates",
+             "Crossfit"
+        };
+
         // GET: Professores/Create
         public IActionResult Create()
         {
+            ViewBag.Especialidades = _especialidades;
             return View();
         }
 
         // POST: Professores/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome,Especialidade")] Professor professor)
         {
-            int totalProfessores = await _context.Professores.CountAsync();
-            int totalEquipamentos = await _context.Equipamentos.SumAsync(e => e.Quantidade);
+            // Verifica se já existe um professor com a mesma especialidade
+            bool existe = await _context.Professores
+                .AnyAsync(p => p.Especialidade == professor.Especialidade);
 
-            if (totalProfessores >= totalEquipamentos)
+            if (existe)
             {
-                ModelState.AddModelError("", "Não é possível cadastrar mais professores. Equipamentos insuficientes.");
+                ModelState.AddModelError("Especialidade", "Já existe um professor cadastrado com esta especialidade.");
+                ViewBag.Especialidades = _especialidades;
                 return View(professor);
             }
 
@@ -70,9 +81,9 @@ namespace AcademiaMvc.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Especialidades = _especialidades;
             return View(professor);
         }
-
         // GET: Professores/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -86,12 +97,12 @@ namespace AcademiaMvc.Controllers
             {
                 return NotFound();
             }
+
+            // Passa a lista de especialidades para o combo-box
+            ViewBag.Especialidades = _especialidades;
             return View(professor);
         }
-
         // POST: Professores/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Especialidade")] Professor professor)
@@ -99,6 +110,17 @@ namespace AcademiaMvc.Controllers
             if (id != professor.Id)
             {
                 return NotFound();
+            }
+
+            // Valida se já existe outro professor com a mesma especialidade
+            bool existe = await _context.Professores
+                .AnyAsync(p => p.Especialidade == professor.Especialidade && p.Id != professor.Id);
+
+            if (existe)
+            {
+                ModelState.AddModelError("Especialidade", "Já existe outro professor cadastrado com esta especialidade.");
+                ViewBag.Especialidades = _especialidades;
+                return View(professor);
             }
 
             if (ModelState.IsValid)
@@ -110,7 +132,7 @@ namespace AcademiaMvc.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProfessorExists(professor.Id))
+                    if (!_context.Professores.Any(e => e.Id == professor.Id))
                     {
                         return NotFound();
                     }
@@ -121,6 +143,7 @@ namespace AcademiaMvc.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.Especialidades = _especialidades;
             return View(professor);
         }
 

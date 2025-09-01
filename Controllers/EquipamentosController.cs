@@ -1,11 +1,12 @@
+using AcademiaMvc.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AcademiaMvc.Models;
 
 namespace AcademiaMvc.Controllers
 {
@@ -44,30 +45,39 @@ namespace AcademiaMvc.Controllers
 
         // GET: Equipamentos/Create
         public IActionResult Create()
+    {
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/data/equipamentos.json");
+
+        var equipamentos = new List<string>();
+        if (System.IO.File.Exists(filePath))
         {
-            return View();
+            var json = System.IO.File.ReadAllText(filePath);
+            equipamentos = JsonConvert.DeserializeObject<List<string>>(json);
         }
 
+        ViewBag.Equipamentos = new SelectList(equipamentos);
+
+        return View();
+    }
+
         // POST: Equipamentos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome,Marca,Quantidade")] Equipamento equipamento)
         {
-            // Verifica duplicidade
-            if (_context.Equipamentos.Any(e => e.Nome == equipamento.Nome))
-            {
-                ModelState.AddModelError("Nome", "Já existe um equipamento com este nome.");
-                return View(equipamento);
-            }
-
             if (ModelState.IsValid)
             {
                 _context.Add(equipamento);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Recarrega lista se algo falhar
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/data/equipamentos.json");
+            var json = System.IO.File.ReadAllText(filePath);
+            var equipamentos = JsonConvert.DeserializeObject<List<string>>(json);
+            ViewBag.Equipamentos = new SelectList(equipamentos);
+
             return View(equipamento);
         }
 

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Incluir Aluno</h1>
+<h1>Incluir</h1>
 
 <h4>Aluno</h4>
 <hr />
@@ -30,13 +30,25 @@
 
             <div class="form-group">
                 <label asp-for="EquipamentoId" class="control-label">Equipamento</label>
-                <select asp-for="EquipamentoId" class="form-control" asp-items="ViewBag.EquipamentoId"></select>
+                <select asp-for="EquipamentoId" class="form-control" asp-items="ViewBag.EquipamentoId">
+                    @if (ViewBag.EquipamentoId == null || ((SelectList)ViewBag.EquipamentoId).Count() == 0)
+                    {
+                        <option value="">-- Equipamentos Indisponíveis --</option>
+                    }
+                    else
+                    {
+                        <option value="">-- Selecione um Equipamento --</option>
+                    }
+                </select>
                 <span asp-validation-for="EquipamentoId" class="text-danger"></span>
             </div>
 
+
             <div class="form-group">
                 <label asp-for="CategoriaId" class="control-label">Categoria</label>
-                <select asp-for="CategoriaId" class="form-control" asp-items="ViewBag.CategoriaId"></select>
+                <select asp-for="CategoriaId" class="form-control"  asp-items="ViewBag.CategoriaId">
+                <option value="">-- Selecione uma Categoria --</option>
+                </select>
                 <span asp-validation-for="CategoriaId" class="text-danger"></span>
             </div>
 

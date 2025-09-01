@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Incluir Professor</h1>
+<h1>Incluir</h1>
 
 <h4>Professor</h4>
 <hr />
@@ -17,9 +17,13 @@
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Especialidade" class="control-label"></label>
-                <input asp-for="Especialidade" class="form-control" />
+                <label asp-for="Especialidade" class="control-label">Especialidade</label>
+                <select asp-for="Especialidade" class="form-control"
+                        asp-items="@(new SelectList(ViewBag.Especialidades))">
+                    <option value="">-- Selecione uma Especialidade --</option>
+                </select>
                 <span asp-validation-for="Especialidade" class="text-danger"></span>
             </div>
             <div class="form-group">
